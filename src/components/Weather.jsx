@@ -21,21 +21,42 @@ const Weather = () => {
     const [weatherData, setWeatherdata] = useState({});
     const [error, setError] = useState(null);
 
+    // TO DISPLAY WEATHER IMAGES
+    const [weatherIcon, setWeatherIcon] = useState('');
+    const allIcons = {
+        '01d': clear_icon,
+        '01n': clear_icon,
+        '02d': cloud_icon,
+        '02n': cloud_icon,
+        '03d': cloud_icon,
+        '03n': cloud_icon,
+        '04d': drizzle_icon,
+        '04n': drizzle_icon,
+        '09d': rain_icon,
+        '09n': rain_icon,
+        '10d': rain_icon,
+        '10n': rain_icon,
+        '13d': snow_icon,
+        '13n': snow_icon
+    }
+
+    // TO FETCH API
     const searchPressed = () => {
         try {
             fetch(`${api.base}weather?q=${search}&units=metric&&APPID=${api.key}`)
-            .then(res => res.json())
+            .then(res => 
+                res.json()
+            )
             .then(result => {
-                if(!result) {
-                    // setError(result.messsage);
-                    // console.log(error);
-                }
-                else {
+                if(result) {
                     // console.log(result)
                     setError(result.message)
                     setWeatherdata(result);
-                    console.log(error);
+                    setWeatherIcon(result.weather[0].icon)
+                    console.log(weatherIcon);
+                    console.log(result);
                 }
+                
            
         })
         
@@ -46,20 +67,24 @@ const Weather = () => {
         setSearch('');
     }
 
-    // useEffect(() => {
+    // PRESSING THE ENTER KEY IN INPUT
+    const handleKeyDown = (e) => {
+        if(e.key === 'Enter') {
+            searchPressed();
+        }
+    }
 
-    // })
 
   return (
     <div className='weather'>
         <h1 className='title'>Weather App</h1>
         <div className="search-bar">
-            <input type="text" placeholder='Search...' onChange={(e) => setSearch(e.target.value)} />
+            <input type="text" onKeyDown={handleKeyDown} placeholder='Search...' onChange={(e) => setSearch(e.target.value)} />
             <img src={search_icon} alt="" onClick={searchPressed} />
         </div>
         {typeof weatherData.main != 'undefined'? 
             <>
-                <img src={clear_icon} alt="" className='weather-icon' />
+                <img src={allIcons[weatherIcon]} alt="" className='weather-icon' />
                 <p className='temperature'>{Math.floor(weatherData.main.temp)}°c</p>
                 <p className='location'>{weatherData.name}</p>
                 <div className="weather-data">
